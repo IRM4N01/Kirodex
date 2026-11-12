@@ -1,5 +1,6 @@
 import { loadList, saveList } from './storage.js';
-import { renderList } from './render.js';
+import { renderList, renderResults } from './render.js';
+import { searchMedia } from './api.js';
 
 const container = document.querySelector('#list');
 let list = loadList();
@@ -35,3 +36,34 @@ container.addEventListener('click', (e) => {
 });
 
 renderList(list, container);
+
+const input = document.querySelector('#search-input');
+const resultsEl = document.querySelector('#results');
+let searchTimer;
+
+input.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  const text = input.value.trim();
+
+  if (text.length < 2) {
+    resultsEl.innerHTML = '';
+    return;
+  }
+
+  searchTimer = setTimeout(() => runSearch(text), 400);
+});
+
+async function runSearch(text) {
+  resultsEl.innerHTML = '<li class="status-msg">Searching…</li>';
+
+  try {
+    const results = await searchMedia(text);
+
+    if (text !== input.value.trim()) return;
+
+    renderResults(results, resultsEl);
+  } catch (err) {
+    console.error(err);
+    resultsEl.innerHTML = '<li class="status-msg">Search failed. Check your connection.</li>';
+  }
+}

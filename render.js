@@ -30,3 +30,37 @@ export function renderList(list, container) {
     container.append(li);
   }
 }
+
+export function renderResults(results, container) {
+  container.innerHTML = '';
+
+  if (results.length === 0) {
+    const li = document.createElement('li');
+    li.className = 'status-msg';
+    li.textContent = 'No results found.';
+    container.append(li);
+    return;
+  }
+
+  for (const r of results) {
+    const li = document.createElement('li');
+    li.className = 'card';
+
+    const img = document.createElement('img');
+    img.src = r.cover;
+    img.alt = '';
+    img.className = 'cover';
+
+    const title = document.createElement('p');
+    title.className = 'card-title';
+    title.textContent = r.title;
+
+    const meta = document.createElement('p');
+    meta.className = 'card-progress';
+    const unit = r.type === 'ANIME' ? 'episodes' : 'chapters';
+    meta.textContent = r.total ? `${r.total} ${unit}` : 'Ongoing';
+
+    li.append(img, title, meta);
+    container.append(li);
+  }
+}
