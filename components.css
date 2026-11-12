@@ -43,3 +43,19 @@
   color: var(--muted);
   padding: 12px;
 }
+
+.add-btn {
+  height: 40px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.add-btn:disabled {
+  background: #252935;
+  color: var(--muted);
+  cursor: default;
+}

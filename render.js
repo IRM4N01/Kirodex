@@ -5,6 +5,14 @@ export function renderList(list, container) {
     const li = document.createElement('li');
     li.className = 'card';
 
+    if (entry.cover) {
+        const img = document.createElement('img');
+        img.src = entry.cover;
+        img.alt = '';
+        img.className = 'cover';
+        li.append(img);
+    }
+
     const title = document.createElement('p');
     title.className = 'card-title';
     title.textContent = entry.title;
@@ -31,7 +39,7 @@ export function renderList(list, container) {
   }
 }
 
-export function renderResults(results, container) {
+export function renderResults(results, container, list) {
   container.innerHTML = '';
 
   if (results.length === 0) {
@@ -64,7 +72,19 @@ export function renderResults(results, container) {
         meta.textContent = r.type === 'ANIME' ? 'Episodes TBA' : 'Ongoing';
     }
 
-    li.append(img, title, meta);
+    const added = list.some(e => e.mediaId === r.mediaId);
+
+    const btn = document.createElement('button');
+    btn.className = 'add-btn';
+    btn.textContent = added ? 'Added': 'Add';
+    btn.disabled = added;
+    btn.dataset.action = 'add';
+    btn.dataset.id = r.mediaId;
+    btn.setAttribute('aria-label', added
+        ? `${r.title} is already in your list`
+        : `Add ${r.title} to your list`);
+
+    li.append(img, title, meta, btn);
     container.append(li);
   }
 }
