@@ -10,16 +10,23 @@ export function renderList(list, container, emptyMessage = 'Nothing here yet.') 
   }
 
   for (const entry of list) {
+    const isAnime = entry.type === 'ANIME';
+    const isDone = entry.status === 'COMPLETED';
+
     const li = document.createElement('li');
-    li.className = 'card';
+    li.className = isDone ? 'card is-done' : 'card';
 
     if (entry.cover) {
-        const img = document.createElement('img');
-        img.src = entry.cover;
-        img.alt = '';
-        img.className = 'cover';
-        li.append(img);
+      const img = document.createElement('img');
+      img.src = entry.cover;
+      img.alt = '';
+      img.className = 'cover';
+      li.append(img);
     }
+
+    // Middle column: title, progress text, progress bar
+    const body = document.createElement('div');
+    body.className = 'card-body';
 
     const title = document.createElement('p');
     title.className = 'card-title';
@@ -27,24 +34,56 @@ export function renderList(list, container, emptyMessage = 'Nothing here yet.') 
 
     const progress = document.createElement('p');
     progress.className = 'card-progress';
-    const unit = entry.type === 'ANIME' ? 'Ep' : 'Ch';
-    progress.textContent = entry.total
-      ? `${unit} ${entry.progress} / ${entry.total}`
-      : `${unit} ${entry.progress} · ongoing`;
+    progress.textContent = progressText(entry);
 
-    li.append(title, progress);
+    body.append(title, progress);
 
-    if (entry.status !== 'COMPLETED') {
+    if (entry.total && entry.progress > 0) {
+      const track = document.createElement('div');
+      track.className = 'progress-track';
+
+      const bar = document.createElement('div');
+      bar.className = 'progress-bar';
+      bar.style.width = `${Math.round((entry.progress / entry.total) * 100)}%`;
+
+      track.append(bar);
+      body.append(track);
+    }
+
+    li.append(body);
+
+    // Right side: +1 button, or a Done badge
+    if (isDone) {
+      const badge = document.createElement('span');
+      badge.className = 'done-badge';
+      badge.textContent = 'Done';
+      li.append(badge);
+    } else {
       const btn = document.createElement('button');
       btn.className = 'plus-btn';
       btn.textContent = '+1';
       btn.dataset.action = 'plus';
       btn.dataset.id = entry.mediaId;
+      btn.setAttribute('aria-label', `Add one ${isAnime ? 'episode' : 'chapter'} to ${entry.title}`);
       li.append(btn);
     }
 
     container.append(li);
   }
+}
+
+function progressText(entry) {
+  const isAnime = entry.type === 'ANIME';
+  const unit = isAnime ? 'Ep' : 'Ch';
+  const unitWord = isAnime ? 'episodes' : 'chapters';
+
+  if (entry.status === 'PLANNING' && entry.progress === 0) {
+    return entry.total ? `Not started · ${entry.total} ${unitWord}` : 'Not started';
+  }
+  if (entry.total) {
+    return `${unit} ${entry.progress} / ${entry.total}`;
+  }
+  return `${unit} ${entry.progress} · ${isAnime ? 'TBA' : 'ongoing'}`;
 }
 
 export function renderResults(results, container, list) {
@@ -92,7 +131,11 @@ export function renderResults(results, container, list) {
         ? `${r.title} is already in your list`
         : `Add ${r.title} to your list`);
 
-    li.append(img, title, meta, btn);
+    const body = document.createElement('div');
+    body.className = 'card-body';
+    body.append(title, meta);
+
+    li.append(img, body, btn);
     container.append(li);
   }
 }

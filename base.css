@@ -10,7 +10,20 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.4;
+}
+
+h1 {
+  margin: 8px 0 20px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 32px;
+  letter-spacing: -0.5px;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
 }
 
 main { 

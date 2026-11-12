@@ -65,6 +65,10 @@ function addOne(mediaId) {
 
   saveList(list);
   refresh();
+
+  // Play a bump on the freshly drawn +1 button
+  const btn = container.querySelector(`[data-id="${mediaId}"]`);
+  if (btn) btn.classList.add('bump');
 }
 
 function addToList(mediaId) {
@@ -135,7 +139,6 @@ async function runSearch(text) {
 }
 
 const tabsEl = document.querySelector('.tabs');
-const headingEl = document.querySelector('#list-heading');
 
 tabsEl.addEventListener('click', (e) => {
   const tab = e.target.closest('[data-type]');
@@ -148,7 +151,6 @@ tabsEl.addEventListener('click', (e) => {
   }
 
   const isAnime = currentType === 'ANIME';
-  headingEl.textContent = isAnime ? 'Anime' : 'Manga';
   input.placeholder = isAnime ? 'Search anime...' : 'Search manga...';
 
   input.value = '';
@@ -163,3 +165,6 @@ tabsEl.addEventListener('click', (e) => {
 });
 
 refresh();
+
+document.addEventListener('touchstart', () => {}, { passive: true });
+

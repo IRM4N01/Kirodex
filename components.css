@@ -1,7 +1,64 @@
-.list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.list { 
+  list-style: none; 
+  margin: 0;
+  padding: 0; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px; 
+}
+
 .card { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--surface); border-radius: 16px; }
-.card-title { margin: 0; font-weight: 600; flex: 1; }
-.card-progress { margin: 0; color: var(--muted); font-size: 14px; }
+
+.card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-progress {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.progress-track {
+  height: 6px;
+  background: #2E3340;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+.card.is-done .progress-bar {
+  background: #7AA7FF;
+}
+
+.done-badge {
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #22304A;
+  color: #8FB4FF;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
 .plus-btn { width: 52px; height: 44px; border: none; border-radius: 14px; background: var(--accent); font-weight: 700; }
 
 .search {
@@ -94,7 +151,7 @@
 
 .filter {
   height: 40px;
-  padding: 0 14px;
+  padding: 0 12px;
   border: 1px solid #343947;
   border-radius: 20px;
   background: transparent;
@@ -112,4 +169,56 @@
 
 .filter-count {
   opacity: 0.75;
+}
+
+/* Press feedback: buttons shrink slightly when tapped */
+.tab,
+.filter,
+.plus-btn,
+.add-btn {
+  transition: transform 0.1s ease, background-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab:active,
+.filter:active,
+.plus-btn:active,
+.add-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Hover only on devices with a mouse */
+@media (hover: hover) {
+  .plus-btn:hover,
+  .add-btn:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+  .filter:hover,
+  .tab:hover {
+    color: var(--text);
+  }
+}
+
+/* Clear outline when using a keyboard */
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Respect the "Reduce Motion" setting on phones and computers */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@keyframes bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.88); }
+  100% { transform: scale(1); }
+}
+
+.plus-btn.bump {
+  animation: bump 0.2s ease;
 }

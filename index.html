@@ -6,12 +6,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anime Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="base.css">
   <link rel="stylesheet" href="components.css">
 </head>
 
 <body>
   <main>
+    <h1 class="app-title">Anime Tracker</h1>
 
     <nav class="tabs" aria-label="Choose anime or manga">
       <button class="tab" data-type="ANIME" aria-pressed="true">Anime</button>
@@ -23,8 +27,6 @@
       <input id="search-input" type="search" placeholder="Search anime..." autocomplete="off">
       <ul id="results" class="list"></ul>
     </section>
-
-    <h1 id="list-heading">Anime</h1>
 
     <div class="filters" role="group" aria-label="Filter by status">
       <button class="filter" data-status="CURRENT" aria-pressed="true">
