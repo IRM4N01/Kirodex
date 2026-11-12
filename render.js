@@ -58,7 +58,11 @@ export function renderResults(results, container) {
     const meta = document.createElement('p');
     meta.className = 'card-progress';
     const unit = r.type === 'ANIME' ? 'episodes' : 'chapters';
-    meta.textContent = r.total ? `${r.total} ${unit}` : 'Ongoing';
+    if (r.total) {
+        meta.textContent = `${r.total} ${unit}`;
+    } else {
+        meta.textContent = r.type === 'ANIME' ? 'Episodes TBA' : 'Ongoing';
+    }
 
     li.append(img, title, meta);
     container.append(li);

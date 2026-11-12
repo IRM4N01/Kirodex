@@ -13,4 +13,8 @@ body {
   font-family: system-ui, sans-serif;
 }
 
-main { padding: 24px 16px; }
+main { 
+  padding: 24px 16px;
+  max-width: 560px;
+  margin: 0 auto;
+}
