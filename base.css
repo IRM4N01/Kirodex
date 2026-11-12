@@ -27,7 +27,7 @@ button {
 }
 
 main { 
-  padding: 24px 16px;
+  padding: calc(24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
   max-width: 560px;
   margin: 0 auto;
 }
