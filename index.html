@@ -13,16 +13,37 @@
 <body>
   <main>
 
+    <nav class="tabs" aria-label="Choose anime or manga">
+      <button class="tab" data-type="ANIME" aria-pressed="true">Anime</button>
+      <button class="tab" data-type="MANGA" aria-pressed="false">Manga</button>
+    </nav>
+
     <section class="search">
       <label for="search-input" class="search-label">Search AniList</label>
       <input id="search-input" type="search" placeholder="Search anime..." autocomplete="off">
       <ul id="results" class="list"></ul>
     </section>
-    
-    <h1>Anime</h1>
+
+    <h1 id="list-heading">Anime</h1>
+
+    <div class="filters" role="group" aria-label="Filter by status">
+      <button class="filter" data-status="CURRENT" aria-pressed="true">
+        <span class="filter-label">Watching</span> <span class="filter-count">0</span>
+      </button>
+      <button class="filter" data-status="COMPLETED" aria-pressed="false">
+        <span class="filter-label">Completed</span> <span class="filter-count">0</span>
+      </button>
+      <button class="filter" data-status="PLANNING" aria-pressed="false">
+        <span class="filter-label">Plan to watch</span> <span class="filter-count">0</span>
+      </button>
+    </div>
+
     <ul id="list" class="list"></ul>
+
   </main>
+
   <script type="module" src="main.js"></script>
+
 </body>
 
 </html>

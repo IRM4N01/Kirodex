@@ -1,5 +1,13 @@
-export function renderList(list, container) {
+export function renderList(list, container, emptyMessage = 'Nothing here yet.') {
   container.innerHTML = '';
+
+  if (list.length === 0) {
+    const li = document.createElement('li');
+    li.className = 'status-msg';
+    li.textContent = emptyMessage;
+    container.append(li);
+    return;
+  }
 
   for (const entry of list) {
     const li = document.createElement('li');

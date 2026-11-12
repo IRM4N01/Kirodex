@@ -3,7 +3,53 @@ import { renderList, renderResults } from './render.js';
 import { searchMedia } from './api.js';
 
 const container = document.querySelector('#list');
+const filtersEl = document.querySelector('.filters');   // NEW
 let list = loadList();
+let currentType = 'ANIME';
+let currentStatus = 'CURRENT';   // NEW: which filter is on
+
+function refresh() {
+  const visible = list.filter(e =>
+    e.type === currentType && e.status === currentStatus
+  );
+
+  const isAnime = currentType === 'ANIME';
+  const emptyMessages = {
+    CURRENT: isAnime ? "You're not watching anything yet." : "You're not reading anything yet.",
+    COMPLETED: 'Nothing completed yet.',
+    PLANNING: 'Your plan list is empty. Search above to add something.'
+  };
+
+  renderList(visible, container, emptyMessages[currentStatus]);
+  updateFilters();
+}
+
+// NEW: switch filter, update the buttons, redraw
+function setFilter(status) {
+  currentStatus = status;
+  for (const f of filtersEl.querySelectorAll('[data-status]')) {
+    f.setAttribute('aria-pressed', f.dataset.status === status ? 'true' : 'false');
+  }
+  refresh();
+}
+
+// NEW: "Watching" vs "Reading" depending on the tab
+function updateFilters() {
+  const isAnime = currentType === 'ANIME';
+  const labels = {
+    CURRENT: isAnime ? 'Watching' : 'Reading',
+    COMPLETED: 'Completed',
+    PLANNING: isAnime ? 'Plan to watch' : 'Plan to read'
+  };
+
+  for (const btn of filtersEl.querySelectorAll('[data-status]')) {
+    const status = btn.dataset.status;
+    const count = list.filter(e => e.type === currentType && e.status === status).length;
+
+    btn.querySelector('.filter-label').textContent = labels[status];
+    btn.querySelector('.filter-count').textContent = count;
+  }
+}
 
 function addOne(mediaId) {
   const entry = list.find(e => e.mediaId === mediaId);
@@ -18,10 +64,9 @@ function addOne(mediaId) {
   entry.updatedAt = Date.now();
 
   saveList(list);
-  renderList(list, container);
+  refresh();
 }
 
-//Adds a search result to the list
 function addToList(mediaId) {
   if (list.some(e => e.mediaId === mediaId)) return;
 
@@ -36,17 +81,20 @@ function addToList(mediaId) {
   });
 
   saveList(list);
-  renderList(list, container);
+  setFilter('PLANNING');   // CHANGED: show the Plan list so you can see what you just added
   renderResults(lastResults, resultsEl, list);
 }
 
-// One listener on the list handles every +1 button, even ones added later
 container.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-action="plus"]');
   if (btn) addOne(Number(btn.dataset.id));
 });
 
-renderList(list, container);
+// NEW: filter clicks
+filtersEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-status]');
+  if (btn) setFilter(btn.dataset.status);
+});
 
 const input = document.querySelector('#search-input');
 const resultsEl = document.querySelector('#results');
@@ -65,7 +113,6 @@ input.addEventListener('input', () => {
   searchTimer = setTimeout(() => runSearch(text), 400);
 });
 
-// one listener on the results handles every Add button
 resultsEl.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-action="add"]');
   if (btn) addToList(Number(btn.dataset.id));
@@ -75,7 +122,7 @@ async function runSearch(text) {
   resultsEl.innerHTML = '<li class="status-msg">Searching…</li>';
 
   try {
-    const results = await searchMedia(text);
+    const results = await searchMedia(text, currentType);
 
     if (text !== input.value.trim()) return;
 
@@ -86,3 +133,33 @@ async function runSearch(text) {
     resultsEl.innerHTML = '<li class="status-msg">Search failed. Check your connection.</li>';
   }
 }
+
+const tabsEl = document.querySelector('.tabs');
+const headingEl = document.querySelector('#list-heading');
+
+tabsEl.addEventListener('click', (e) => {
+  const tab = e.target.closest('[data-type]');
+  if (!tab) return;
+
+  currentType = tab.dataset.type;
+
+  for (const t of tabsEl.querySelectorAll('[data-type]')) {
+    t.setAttribute('aria-pressed', t === tab ? 'true' : 'false');
+  }
+
+  const isAnime = currentType === 'ANIME';
+  headingEl.textContent = isAnime ? 'Anime' : 'Manga';
+  input.placeholder = isAnime ? 'Search anime...' : 'Search manga...';
+
+  input.value = '';
+  resultsEl.innerHTML = '';
+  lastResults = [];
+
+  input.value = '';
+  resultsEl.innerHTML = '';
+  lastResults = [];
+
+  setFilter('CURRENT');   
+});
+
+refresh();

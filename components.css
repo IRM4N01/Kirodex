@@ -59,3 +59,57 @@
   color: var(--muted);
   cursor: default;
 }
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  padding: 4px;
+  margin-bottom: 20px;
+  background: var(--surface);
+  border-radius: 14px;
+}
+
+.tab {
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.tab[aria-pressed="true"] {
+  background: #343947;
+  color: var(--text);
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+}
+
+.filter {
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid #343947;
+  border-radius: 20px;
+  background: transparent;
+  color: #C9CDD6;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.filter[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1A0E08;
+}
+
+.filter-count {
+  opacity: 0.75;
+}
