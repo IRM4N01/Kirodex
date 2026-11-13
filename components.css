@@ -222,3 +222,116 @@ button:focus-visible {
 .plus-btn.bump {
   animation: bump 0.2s ease;
 }
+
+/* Tappable part of the card */
+.card-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.card-title,
+.card-progress,
+.progress-bar {
+  display: block;
+}
+
+/* Edit panel */
+.sheet {
+  width: min(100% - 32px, 480px);
+  margin: auto auto calc(16px + env(safe-area-inset-bottom));
+  padding: 0;
+  border: none;
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.sheet::backdrop {
+  background: rgb(0 0 0 / 0.6);
+}
+
+.sheet-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+}
+
+.sheet-title {
+  margin: 0 0 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px;
+}
+
+.field-label {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.progress-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sheet input,
+.sheet select {
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--surface-raised);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+}
+
+.sheet input {
+  width: 120px;
+}
+
+.field-suffix {
+  color: var(--muted);
+}
+
+.sheet-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.sheet-actions button {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.btn-danger {
+  margin-right: auto;
+  border: none;
+  background: transparent;
+  color: #FF7A7A;
+}
+
+.btn-secondary {
+  border: 1px solid var(--surface-raised);
+  background: transparent;
+  color: var(--text);
+}
+
+.btn-primary {
+  border: none;
+  background: var(--accent);
+  color: #1A0E08;
+}

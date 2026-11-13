@@ -61,6 +61,32 @@
 
   </main>
 
+  <!-- Edit panel -->
+  <dialog id="edit-dialog" class="sheet" aria-labelledby="edit-title">
+    <form id="edit-form" class="sheet-form">
+      <h2 id="edit-title" class="sheet-title"></h2>
+
+      <label for="edit-progress" id="edit-progress-label" class="field-label">Episodes watched</label>
+      <div class="progress-field">
+        <input id="edit-progress" type="number" inputmode="numeric" min="0" step="1">
+        <span id="edit-total" class="field-suffix"></span>
+      </div>
+
+      <label for="edit-status" class="field-label">Status</label>
+      <select id="edit-status">
+        <option value="CURRENT">Watching</option>
+        <option value="COMPLETED">Completed</option>
+        <option value="PLANNING">Plan to watch</option>
+      </select>
+
+      <div class="sheet-actions">
+        <button type="button" class="btn-danger" data-action="remove">Remove</button>
+        <button type="button" class="btn-secondary" data-action="cancel">Cancel</button>
+        <button type="submit" class="btn-primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
   <script type="module" src="main.js"></script>
 
 </body>

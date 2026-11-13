@@ -16,33 +16,38 @@ export function renderList(list, container, emptyMessage = 'Nothing here yet.') 
     const li = document.createElement('li');
     li.className = isDone ? 'card is-done' : 'card';
 
+        // Tappable area: cover + info. Opens the edit panel.
+    const main = document.createElement('button');
+    main.className = 'card-main';
+    main.dataset.action = 'edit';
+    main.dataset.id = entry.mediaId;
+
     if (entry.cover) {
       const img = document.createElement('img');
       img.src = entry.cover;
       img.alt = '';
       img.className = 'cover';
-      li.append(img);
+      main.append(img);
     }
 
-    // Middle column: title, progress text, progress bar
-    const body = document.createElement('div');
+    const body = document.createElement('span');
     body.className = 'card-body';
 
-    const title = document.createElement('p');
+    const title = document.createElement('span');
     title.className = 'card-title';
     title.textContent = entry.title;
 
-    const progress = document.createElement('p');
+    const progress = document.createElement('span');
     progress.className = 'card-progress';
     progress.textContent = progressText(entry);
 
     body.append(title, progress);
 
     if (entry.total && entry.progress > 0) {
-      const track = document.createElement('div');
+      const track = document.createElement('span');
       track.className = 'progress-track';
 
-      const bar = document.createElement('div');
+      const bar = document.createElement('span');
       bar.className = 'progress-bar';
       bar.style.width = `${Math.round((entry.progress / entry.total) * 100)}%`;
 
@@ -50,7 +55,8 @@ export function renderList(list, container, emptyMessage = 'Nothing here yet.') 
       body.append(track);
     }
 
-    li.append(body);
+    main.append(body);
+    li.append(main);
 
     // Right side: +1 button, or a Done badge
     if (isDone) {
