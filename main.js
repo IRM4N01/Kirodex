@@ -1,6 +1,9 @@
 import { loadList, saveList } from './storage.js';
 import { renderList, renderResults } from './render.js';
 import { searchMedia } from './api.js';
+import { runSplash } from './splash.js';
+
+runSplash();
 
 const container = document.querySelector('#list');
 const filtersEl = document.querySelector('.filters');   // NEW

@@ -34,7 +34,7 @@
 
 .progress-track {
   height: 6px;
-  background: #2E3340;
+  background: var(--track);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -77,7 +77,7 @@
   height: 48px;
   padding: 0 14px;
   border-radius: 14px;
-  border: 1px solid #343947;
+  border: 1px solid var(--surface-raised);
   background: var(--surface);
   color: var(--text);
   font-size: 16px;
@@ -112,7 +112,7 @@
 }
 
 .add-btn:disabled {
-  background: #252935;
+  background: var(--disabled);
   color: var(--muted);
   cursor: default;
 }
@@ -138,7 +138,7 @@
 }
 
 .tab[aria-pressed="true"] {
-  background: #343947;
+  background: var(--surface-raised);
   color: var(--text);
 }
 
@@ -152,10 +152,10 @@
 .filter {
   height: 40px;
   padding: 0 12px;
-  border: 1px solid #343947;
+  border: 1px solid var(--surface-raised);
   border-radius: 20px;
   background: transparent;
-  color: #C9CDD6;
+  color: var(--text-soft);
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;

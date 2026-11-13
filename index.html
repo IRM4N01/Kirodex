@@ -17,11 +17,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="base.css">
   <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="splash.css">
+  <link rel="icon" href="icons/Kirodex-icon-192.png" type="image/png">
 </head>
 
 <body>
+  <!--Splash screen-->
+  <div id="splash" class="splash" aria-hidden="true">
+    <img src="images/kirodex-logo.webp" alt="" class="splash-logo">
+  </div>
+
+  <!--Main content-->
   <main>
-    <h1 class="app-title">Anime Tracker</h1>
+    <header class="app-header">
+      <h1 class="app-title">Okaeri!</h1>
+      <p class="app-tagline">Welcome back. Pick up where you left off.</p>
+    </header>
 
     <nav class="tabs" aria-label="Choose anime or manga">
       <button class="tab" data-type="ANIME" aria-pressed="true">Anime</button>

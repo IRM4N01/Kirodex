@@ -1,4 +1,4 @@
-const CACHE = 'kirodex-v1';
+const CACHE = 'kirodex-v2';
 
 // Files to save on install, so the app opens offline straight away
 const APP_SHELL = [
@@ -13,7 +13,10 @@ const APP_SHELL = [
   './js/api.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/apple-touch-icon.png'
+  './icons/apple-touch-icon.png',
+  './css/splash.css',
+   './js/splash.js',
+   './images/kirodex-logo.webp'
 ];
 
 // 1. INSTALL: save the app files
