@@ -1,4 +1,4 @@
-const KEY = 'tracker.list.v1';
+const KEY = 'kirodex.list.v1';
 
 export function loadList() {
   try {
