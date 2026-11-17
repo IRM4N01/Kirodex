@@ -89,7 +89,7 @@ function addToList(mediaId) {
 
   saveList(list);
   setFilter('PLANNING');   
-  renderResults(lastResults, resultsEl, list);
+   clearSearch();
 }
 
 container.addEventListener('click', (e) => {
@@ -109,11 +109,21 @@ filtersEl.addEventListener('click', (e) => {
 
 const input = document.querySelector('#search-input');
 const resultsEl = document.querySelector('#results');
+const clearBtn = document.querySelector('#search-clear');
 let searchTimer;
 let lastResults = [];
 
+function clearSearch() {
+  clearTimeout(searchTimer);
+  input.value = '';
+  resultsEl.innerHTML = '';
+  lastResults = [];
+  clearBtn.hidden = true;
+}
+
 input.addEventListener('input', () => {
   clearTimeout(searchTimer);
+  clearBtn.hidden = input.value === '';
   const text = input.value.trim();
 
   if (text.length < 2) {
@@ -122,6 +132,11 @@ input.addEventListener('input', () => {
   }
 
   searchTimer = setTimeout(() => runSearch(text), 400);
+});
+
+clearBtn.addEventListener('click', () => {
+  clearSearch();
+  input.focus();
 });
 
 resultsEl.addEventListener('click', (e) => {
@@ -160,9 +175,7 @@ tabsEl.addEventListener('click', (e) => {
   const isAnime = currentType === 'ANIME';
   input.placeholder = isAnime ? 'Search anime...' : 'Search manga...';
 
-  input.value = '';
-  resultsEl.innerHTML = '';
-  lastResults = [];
+  clearSearch();
 
   setFilter('CURRENT');   
 });
