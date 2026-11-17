@@ -1,22 +1,22 @@
-const CACHE = 'kirodex-v2';
+const CACHE = 'kirodex-v4';
 
 // Files to save on install, so the app opens offline straight away
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './css/base.css',
-  './css/components.css',
-  './js/main.js',
-  './js/storage.js',
-  './js/render.js',
-  './js/api.js',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/apple-touch-icon.png',
-  './css/splash.css',
-   './js/splash.js',
-   './images/kirodex-logo.webp'
+  './base.css',
+  './components.css',
+  './main.js',
+  './storage.js',
+  './render.js',
+  './api.js',
+  './icons/Kirodex-icon-192.png',
+  './icons/Kirodex-icon-512.png',
+  './icons/Kirodex-apple-touch-icon.png',
+  './splash.css',
+  './splash.js',
+  './images/kirodex-logo.webp'
 ];
 
 // 1. INSTALL: save the app files
@@ -48,6 +48,9 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
+
+  // Only handle normal web requests (skip browser extensions etc.)
+  if (!url.protocol.startsWith('http')) return;
 
   if (url.origin === self.location.origin) {
     event.respondWith(networkFirst(req));   // your own files

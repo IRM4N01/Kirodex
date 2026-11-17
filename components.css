@@ -367,3 +367,9 @@ button:focus-visible {
   background: var(--accent);
   color: #1A0E08;
 }
+
+.pages {
+  position: relative;
+  min-height: 50vh;
+  touch-action: pan-y;
+}

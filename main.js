@@ -93,6 +93,11 @@ function addToList(mediaId) {
 }
 
 container.addEventListener('click', (e) => {
+  if (justSwiped) {        
+    justSwiped = false;
+    return;
+  }
+
   const btn = e.target.closest('[data-action]');
   if (!btn) return;
 
@@ -105,6 +110,47 @@ container.addEventListener('click', (e) => {
 filtersEl.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-status]');
   if (btn) setFilter(btn.dataset.status);
+});
+
+// Swipe between filters: left = forward, right = back
+const pagesEl = document.querySelector('#pages');
+const FILTER_ORDER = ['CURRENT', 'COMPLETED', 'PLANNING'];
+const SWIPE_DISTANCE = 60;
+
+let startX = 0;
+let startY = 0;
+let tracking = false;
+let justSwiped = false;
+
+pagesEl.addEventListener('pointerdown', (e) => {
+  if (e.pointerType === 'mouse') return;
+  tracking = true;
+  justSwiped = false;
+  startX = e.clientX;
+  startY = e.clientY;
+});
+
+pagesEl.addEventListener('pointerup', (e) => {
+  if (!tracking) return;
+  tracking = false;
+
+  const dx = e.clientX - startX;
+  const dy = e.clientY - startY;
+
+  // Too short, or more up/down than sideways: not a swipe
+  if (Math.abs(dx) < SWIPE_DISTANCE || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+
+  justSwiped = true;
+
+  const index = FILTER_ORDER.indexOf(currentStatus);
+  const next = dx < 0 ? index + 1 : index - 1;
+  if (next < 0 || next >= FILTER_ORDER.length) return;
+
+  setFilter(FILTER_ORDER[next]);
+});
+
+pagesEl.addEventListener('pointercancel', () => {
+  tracking = false;
 });
 
 const input = document.querySelector('#search-input');
@@ -291,7 +337,7 @@ removeBtn.addEventListener('click', () => {
   saveList(list);
   dialog.close();
   refresh();
-  renderResults(lastResults, resultsEl, list);
+  if (lastResults.length) renderResults(lastResults, resultsEl, list);
 });
 
 // Whenever the panel closes (any way), reset the Remove button
