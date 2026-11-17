@@ -109,13 +109,59 @@ container.addEventListener('click', (e) => {
 
 filtersEl.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-status]');
-  if (btn) setFilter(btn.dataset.status);
+  if (btn) turnTo(btn.dataset.status);
 });
 
 // Swipe between filters: left = forward, right = back
 const pagesEl = document.querySelector('#pages');
 const FILTER_ORDER = ['CURRENT', 'COMPLETED', 'PLANNING'];
 const SWIPE_DISTANCE = 60;
+
+const TURN_MS = 400;   // keep in sync with the 0.4s in the CSS
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let turning = false;
+
+function turnTo(status) {
+  if (status === currentStatus || turning) return;
+
+  // No animation for people who've turned on Reduce Motion
+  if (reduceMotion.matches) {
+    setFilter(status);
+    return;
+  }
+
+  const forward = FILTER_ORDER.indexOf(status) > FILTER_ORDER.indexOf(currentStatus);
+  turning = true;
+
+  // 1. Copy the current page before it changes
+  const snapshot = container.cloneNode(true);
+  snapshot.removeAttribute('id');
+  snapshot.classList.add('page-snapshot');
+  snapshot.setAttribute('aria-hidden', 'true');
+  snapshot.inert = true;
+  const oldHeight = container.offsetHeight;
+
+  // 2. Draw the new page
+  setFilter(status);
+
+  // 3. Animate
+  if (forward) {
+    snapshot.classList.add('page-out');           // old page turns away on top
+  } else {
+    snapshot.classList.add('page-under');         // old page waits underneath
+    container.style.minHeight = `${oldHeight}px`; // new page fully covers it
+    container.classList.add('page-in');           // new page turns in over it
+  }
+  pagesEl.append(snapshot);
+
+  // 4. Clean up when the turn is finished
+  setTimeout(() => {
+    snapshot.remove();
+    container.classList.remove('page-in');
+    container.style.minHeight = '';
+    turning = false;
+  }, TURN_MS);
+}
 
 let startX = 0;
 let startY = 0;
@@ -146,7 +192,7 @@ pagesEl.addEventListener('pointerup', (e) => {
   const next = dx < 0 ? index + 1 : index - 1;
   if (next < 0 || next >= FILTER_ORDER.length) return;
 
-  setFilter(FILTER_ORDER[next]);
+  turnTo(FILTER_ORDER[next]);
 });
 
 pagesEl.addEventListener('pointercancel', () => {

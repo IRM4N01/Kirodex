@@ -373,3 +373,48 @@ button:focus-visible {
   min-height: 50vh;
   touch-action: pan-y;
 }
+
+/* Page turn */
+#list {
+  position: relative;
+  z-index: 1;
+  background: var(--bg);
+}
+
+.page-snapshot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  background: var(--bg);
+  pointer-events: none;
+}
+
+.page-snapshot.page-under {
+  z-index: 0;
+}
+
+.page-snapshot.page-out {
+  z-index: 2;
+  transform-origin: left center;
+  backface-visibility: hidden;
+  box-shadow: 0 0 40px rgb(0 0 0 / 0.6);
+  animation: page-out 0.4s ease-in forwards;
+}
+
+#list.page-in {
+  transform-origin: left center;
+  backface-visibility: hidden;
+  animation: page-in 0.4s ease-out;
+}
+
+@keyframes page-out {
+  from { transform: perspective(1600px) rotateY(0deg);   filter: brightness(1); }
+  to   { transform: perspective(1600px) rotateY(-90deg); filter: brightness(0.5); }
+}
+
+@keyframes page-in {
+  from { transform: perspective(1600px) rotateY(-90deg); filter: brightness(0.5); }
+  to   { transform: perspective(1600px) rotateY(0deg);   filter: brightness(1); }
+}
