@@ -7,29 +7,43 @@ runSplash();
 
 const container = document.querySelector('#list');
 const filtersEl = document.querySelector('.filters');   
+
 let list = loadList();
+const FILTERS = {
+  CURRENT:   ['CURRENT'],
+  COMPLETED: ['COMPLETED'],
+  PLANNING:  ['PLANNING'],
+  ON_HOLD:   ['PAUSED', 'DROPPED']
+};
+
+// Which chip does a status belong to? e.g. 'PAUSED' → 'ON_HOLD'
+function filterFor(status) {
+  return Object.keys(FILTERS).find(key => FILTERS[key].includes(status));
+}
+
 let currentType = 'ANIME';
-let currentStatus = 'CURRENT';   
+let currentFilter = 'CURRENT';   
 
 function refresh() {
   const visible = list.filter(e =>
-    e.type === currentType && e.status === currentStatus
+    e.type === currentType && FILTERS[currentFilter].includes(e.status)
   );
 
   const isAnime = currentType === 'ANIME';
   const emptyMessages = {
     CURRENT: isAnime ? "You're not watching anything yet." : "You're not reading anything yet.",
     COMPLETED: 'Nothing completed yet.',
-    PLANNING: 'Your plan list is empty. Search above to add something.'
+    PLANNING: 'Your plan list is empty. Search above to add something.',
+    ON_HOLD: 'Nothing on hold. Paused and dropped titles will show up here.'
   };
 
-  renderList(visible, container, emptyMessages[currentStatus]);
+  renderList(visible, container, emptyMessages[currentFilter]);
   updateFilters();
 }
 
 
 function setFilter(status) {
-  currentStatus = status;
+  currentFilter = status;
   for (const f of filtersEl.querySelectorAll('[data-status]')) {
     f.setAttribute('aria-pressed', f.dataset.status === status ? 'true' : 'false');
   }
@@ -42,14 +56,17 @@ function updateFilters() {
   const labels = {
     CURRENT: isAnime ? 'Watching' : 'Reading',
     COMPLETED: 'Completed',
-    PLANNING: isAnime ? 'Plan to watch' : 'Plan to read'
+    PLANNING: isAnime ? 'Plan to watch' : 'Plan to read',
+    ON_HOLD: 'On hold'
   };
 
   for (const btn of filtersEl.querySelectorAll('[data-status]')) {
-    const status = btn.dataset.status;
-    const count = list.filter(e => e.type === currentType && e.status === status).length;
+    const filter = btn.dataset.status;
+    const count = list.filter(e =>
+      e.type === currentType && FILTERS[filter].includes(e.status)
+    ).length;
 
-    btn.querySelector('.filter-label').textContent = labels[status];
+    btn.querySelector('.filter-label').textContent = labels[filter];
     btn.querySelector('.filter-count').textContent = count;
   }
 }
@@ -59,7 +76,10 @@ function addOne(mediaId) {
   if (!entry) return;
 
   entry.progress += 1;
-  if (entry.status === 'PLANNING') entry.status = 'CURRENT';
+  // Watching an episode means you're watching it again
+  if (['PLANNING', 'PAUSED', 'DROPPED'].includes(entry.status)) {
+    entry.status = 'CURRENT';
+  }
   if (entry.total && entry.progress >= entry.total) {
     entry.progress = entry.total;
     entry.status = 'COMPLETED';
@@ -114,7 +134,7 @@ filtersEl.addEventListener('click', (e) => {
 
 // Swipe between filters: left = forward, right = back
 const pagesEl = document.querySelector('#pages');
-const FILTER_ORDER = ['CURRENT', 'COMPLETED', 'PLANNING'];
+const FILTER_ORDER = Object.keys(FILTERS);
 const SWIPE_DISTANCE = 60;
 
 const TURN_MS = 400;   // keep in sync with the 0.4s in the CSS
@@ -122,7 +142,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let turning = false;
 
 function turnTo(status) {
-  if (status === currentStatus || turning) return;
+  if (status === currentFilter || turning) return;
 
   // No animation for people who've turned on Reduce Motion
   if (reduceMotion.matches) {
@@ -130,7 +150,7 @@ function turnTo(status) {
     return;
   }
 
-  const forward = FILTER_ORDER.indexOf(status) > FILTER_ORDER.indexOf(currentStatus);
+  const forward = FILTER_ORDER.indexOf(status) > FILTER_ORDER.indexOf(currentFilter);
   turning = true;
 
   // 1. Copy the current page before it changes
@@ -188,7 +208,7 @@ pagesEl.addEventListener('pointerup', (e) => {
 
   justSwiped = true;
 
-  const index = FILTER_ORDER.indexOf(currentStatus);
+  const index = FILTER_ORDER.indexOf(currentFilter);
   const next = dx < 0 ? index + 1 : index - 1;
   if (next < 0 || next >= FILTER_ORDER.length) return;
 
@@ -347,7 +367,8 @@ editForm.addEventListener('submit', (e) => {
     status = 'CURRENT';
   }
 
-  const movedFilter = status !== entry.status;
+  const newFilter = filterFor(status);
+  const movedFilter = newFilter !== filterFor(entry.status);
 
   entry.progress = progress;
   entry.status = status;
@@ -358,7 +379,7 @@ editForm.addEventListener('submit', (e) => {
 
   // If it moved to another filter, follow it there so it doesn't seem to vanish
   if (movedFilter) {
-    setFilter(status);
+    setFilter(newFilter);
   } else {
     refresh();
   }

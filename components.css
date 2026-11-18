@@ -418,3 +418,19 @@ button:focus-visible {
   from { transform: perspective(1600px) rotateY(-90deg); filter: brightness(0.5); }
   to   { transform: perspective(1600px) rotateY(0deg);   filter: brightness(1); }
 }
+
+.status-tag {
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--surface-raised);
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.status-tag.is-dropped {
+  color: #FF7A7A;
+}

@@ -41,7 +41,16 @@ export function renderList(list, container, emptyMessage = 'Nothing here yet.') 
     progress.className = 'card-progress';
     progress.textContent = progressText(entry);
 
-    body.append(title, progress);
+    body.append(title);
+
+    if (entry.status === 'PAUSED' || entry.status === 'DROPPED') {
+      const tag = document.createElement('span');
+      tag.className = entry.status === 'DROPPED' ? 'status-tag is-dropped' : 'status-tag';
+      tag.textContent = entry.status === 'PAUSED' ? 'Paused' : 'Dropped';
+      body.append(tag);
+    }
+
+    body.append(progress);
 
     if (entry.total && entry.progress > 0) {
       const track = document.createElement('span');
