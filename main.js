@@ -1,6 +1,7 @@
 import { loadList, saveList } from './storage.js';
 import { renderList, renderResults } from './render.js';
-import { searchMedia, getViewer } from './api.js';
+import { searchMedia, getViewer, getMediaList, saveEntry } from './api.js';
+import { planSync } from './sync.js';
 import { login, logout, getToken, handleRedirect } from './auth.js';
 import { runSplash } from './splash.js';
 
@@ -12,7 +13,7 @@ const filtersEl = document.querySelector('.filters');
 
 let list = loadList();
 const FILTERS = {
-  CURRENT:   ['CURRENT'],
+  CURRENT:   ['CURRENT', 'REPEATING'],
   COMPLETED: ['COMPLETED'],
   PLANNING:  ['PLANNING'],
   ON_HOLD:   ['PAUSED', 'DROPPED']
@@ -299,6 +300,51 @@ const loginBtn = document.querySelector('#login-btn');
 const logoutBtn = document.querySelector('#logout-btn');
 const accountName = document.querySelector('#account-name');
 
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function runSync(token, userId) {
+  const [anime, manga] = await Promise.all([
+    getMediaList(token, userId, 'ANIME'),
+    getMediaList(token, userId, 'MANGA')
+  ]);
+  const remote = [...anime, ...manga];
+  const { toUpload, toDownload } = planSync(list, remote);
+
+  // Safety copy of your list before anything changes
+  localStorage.setItem('kirodex.list.backup', JSON.stringify(list));
+
+  // 1. Download: AniList → Kirodex
+  for (const r of toDownload) {
+    const i = list.findIndex(e => e.mediaId === r.mediaId);
+    if (i === -1) {
+      list.push(r);
+    } else {
+      list[i] = { ...list[i], ...r };
+    }
+  }
+
+  // Remember AniList's entry ID for every show on both sides
+  for (const r of remote) {
+    const entry = list.find(e => e.mediaId === r.mediaId);
+    if (entry) entry.entryId = r.entryId;
+  }
+
+  saveList(list);
+  refresh();
+
+  // 2. Upload: Kirodex → AniList, one at a time
+  for (const [n, entry] of toUpload.entries()) {
+    accountName.textContent = `Uploading to AniList… ${n + 1} of ${toUpload.length}`;
+
+    const saved = await saveEntry(token, entry);
+    entry.entryId = saved.entryId;
+    entry.updatedAt = saved.updatedAt;
+    saveList(list);
+
+    if (n < toUpload.length - 1) await wait(2100);
+  }
+}
+
 async function updateAccount() {
   const token = getToken();
   loginBtn.hidden = Boolean(token);
@@ -308,17 +354,19 @@ async function updateAccount() {
 
   accountName.textContent = 'Connecting to AniList…';
   try {
-    const viewer = await getViewer(token);
-    accountName.textContent = `Synced with AniList as ${viewer.name}`;
-  } catch (err) {
-    console.error(err);
-    if (err.status === 400 || err.status === 401) {
-      // Token rejected: log out so the user can connect again
-      logout();
-      updateAccount();
-    } else {
-      accountName.textContent = 'AniList unavailable right now';
-    }
+        const viewer = await getViewer(token);
+        accountName.textContent = 'Syncing with AniList…';
+        await runSync(token, viewer.id);
+        accountName.textContent = `Synced with AniList as ${viewer.name}`;
+      } catch (err) {
+        console.error(err);
+        if (err.status === 400 || err.status === 401) {
+        // Token rejected: log out so the user can connect again
+        logout();
+        updateAccount();
+        } else {
+          accountName.textContent = 'AniList unavailable right now';
+        }
   }
 }
 
@@ -362,6 +410,7 @@ function openEdit(mediaId) {
 
   statusSelect.value = entry.status;
   statusSelect.querySelector('[value="CURRENT"]').textContent = isAnime ? 'Watching' : 'Reading';
+  statusSelect.querySelector('[value="REPEATING"]').textContent = isAnime ? 'Rewatching' : 'Rereading';
   statusSelect.querySelector('[value="PLANNING"]').textContent = isAnime ? 'Plan to watch' : 'Plan to read';
 
   dialog.showModal();

@@ -50,6 +50,70 @@ export async function getViewer(token) {
   return data.Viewer;
 }
 
+const LIST_QUERY = `
+  query ($userId: Int, $type: MediaType) {
+    MediaListCollection(userId: $userId, type: $type) {
+      lists {
+        entries {
+          id
+          status
+          progress
+          updatedAt
+          media {
+            id
+            title { romaji english }
+            episodes
+            chapters
+            coverImage { medium }
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Load the logged-in user's anime or manga list, in Kirodex's format
+export async function getMediaList(token, userId, type) {
+  const data = await request(LIST_QUERY, { userId, type }, token);
+
+  // AniList splits entries into several lists (Watching, Completed, custom lists...)
+  const entries = data.MediaListCollection.lists.flatMap(l => l.entries);
+
+  // A show can appear in more than one list, so keep one per show
+  const unique = new Map(entries.map(e => [e.media.id, e]));
+
+  return [...unique.values()].map(e => ({
+    ...toResult(e.media, type),
+    entryId: e.id,
+    progress: e.progress ?? 0,
+    status: e.status,
+    updatedAt: e.updatedAt * 1000
+  }));
+}
+
+const SAVE_MUTATION = `
+  mutation ($mediaId: Int, $status: MediaListStatus, $progress: Int) {
+    SaveMediaListEntry(mediaId: $mediaId, status: $status, progress: $progress) {
+      id
+      updatedAt
+    }
+  }
+`;
+
+// Create or update one entry on AniList
+export async function saveEntry(token, entry) {
+  const data = await request(SAVE_MUTATION, {
+    mediaId: entry.mediaId,
+    status: entry.status,
+    progress: entry.progress
+  }, token);
+
+  return {
+    entryId: data.SaveMediaListEntry.id,
+    updatedAt: data.SaveMediaListEntry.updatedAt * 1000
+  };
+}
+
 function toResult(m, type) {
   return {
     mediaId: m.id,
