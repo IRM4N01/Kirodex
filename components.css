@@ -434,3 +434,33 @@ button:focus-visible {
 .status-tag.is-dropped {
   color: #FF7A7A;
 }
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.account-btn {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--accent);
+  border-radius: 18px;
+  background: transparent;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.account-name {
+  color: var(--muted);
+}
+
+.account-link {
+  padding: 8px 4px;
+  border: none;
+  background: none;
+  color: var(--text-soft);
+  text-decoration: underline;
+}

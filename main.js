@@ -1,8 +1,10 @@
 import { loadList, saveList } from './storage.js';
 import { renderList, renderResults } from './render.js';
-import { searchMedia } from './api.js';
+import { searchMedia, getViewer } from './api.js';
+import { login, logout, getToken, handleRedirect } from './auth.js';
 import { runSplash } from './splash.js';
 
+handleRedirect();
 runSplash();
 
 const container = document.querySelector('#list');
@@ -291,6 +293,43 @@ tabsEl.addEventListener('click', (e) => {
 
   setFilter('CURRENT');   
 });
+
+// AniList account
+const loginBtn = document.querySelector('#login-btn');
+const logoutBtn = document.querySelector('#logout-btn');
+const accountName = document.querySelector('#account-name');
+
+async function updateAccount() {
+  const token = getToken();
+  loginBtn.hidden = Boolean(token);
+  logoutBtn.hidden = !token;
+  accountName.hidden = !token;
+  if (!token) return;
+
+  accountName.textContent = 'Connecting to AniList…';
+  try {
+    const viewer = await getViewer(token);
+    accountName.textContent = `Synced with AniList as ${viewer.name}`;
+  } catch (err) {
+    console.error(err);
+    if (err.status === 400 || err.status === 401) {
+      // Token rejected: log out so the user can connect again
+      logout();
+      updateAccount();
+    } else {
+      accountName.textContent = 'AniList unavailable right now';
+    }
+  }
+}
+
+loginBtn.addEventListener('click', login);
+
+logoutBtn.addEventListener('click', () => {
+  logout();
+  updateAccount();
+});
+
+updateAccount();
 
 // Edit panel
 const dialog = document.querySelector('#edit-dialog');

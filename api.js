@@ -14,23 +14,40 @@ const SEARCH_QUERY = `
   }
 `;
 
-export async function searchMedia(text, type = 'ANIME') {
+// Every AniList request goes through here
+async function request(query, variables = {}, token = null) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+
   const res = await fetch(ENDPOINT, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify({
-      query: SEARCH_QUERY,
-      variables: { search: text, type }
-    })
+    headers,
+    body: JSON.stringify({ query, variables })
   });
 
-  if (!res.ok) throw new Error(`AniList error: ${res.status}`);
-
   const json = await res.json();
-  return json.data.Page.media.map(m => toResult(m, type));
+
+  if (!res.ok || json.errors) {
+    const err = new Error(json.errors?.[0]?.message ?? `AniList error: ${res.status}`);
+    err.status = res.status;
+    throw err;
+  }
+
+  return json.data;
+}
+
+export async function searchMedia(text, type = 'ANIME') {
+  const data = await request(SEARCH_QUERY, { search: text, type });
+  return data.Page.media.map(m => toResult(m, type));
+}
+
+// Who is logged in?
+export async function getViewer(token) {
+  const data = await request(`query { Viewer { id name } }`, {}, token);
+  return data.Viewer;
 }
 
 function toResult(m, type) {
